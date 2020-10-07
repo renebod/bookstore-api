@@ -1,0 +1,32 @@
+version: '3.2'
+
+services:
+
+  bookstore:
+    build:
+      context: ./docker
+    image: bookstore_custom
+    command:  bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./code/:/code
+    ports:
+      - 8000:8000
+    networks:
+      - lab_network
+
+  jupyter:
+    image: bookstore_custom
+    command: jupyter notebook --ip=0.0.0.0 --allow-root --no-browser --NotebookApp.password=sha1:58eaa2e688ae:11fd96685b9203d1256a1e09603c9be4f62c94b6
+    volumes:
+      - ./notebooks/:/code
+      - ./code/:/bookstore
+      - ./templates/:/templates
+    ports:
+      - 8888:8888
+    networks:
+      - lab_network
+
+
+networks:
+  lab_network:
+    external: false

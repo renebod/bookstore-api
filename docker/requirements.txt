@@ -1,0 +1,7 @@
+Django
+django_extensions
+djangorestframework
+jupyter
+#psycopg2-binary
+requests
+bs4

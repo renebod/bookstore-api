@@ -1,0 +1,17 @@
+from django.urls import include, path
+from django.conf.urls import url
+from rest_framework import routers
+from rest_framework.schemas import get_schema_view
+from .views import *
+
+schema_view = get_schema_view(title='Bookstore API')
+
+router = routers.DefaultRouter()
+router.register('author', AuthorViewSet)
+router.register('book', BookViewSet)
+
+
+urlpatterns = [
+    url(r'^', include(router.urls)),
+    url(r'^schema/$', schema_view),
+]
