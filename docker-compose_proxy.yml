@@ -1,0 +1,78 @@
+version: '3.2'
+
+services:
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - lab_network
+
+  bookstore_builder:
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile
+    command: echo "Build done . . ."
+    image: bookstore_custom
+
+  bookstore01:
+    image: bookstore_custom
+    environment:
+      - VIRTUAL_HOST=bookstore.local
+    ports:
+      - 8021:8000
+    networks:
+      - lab_network
+
+  bookstore02:
+    image: bookstore_custom
+    environment:
+      - VIRTUAL_HOST=bookstore.local
+    ports:
+      - 8022:8000
+    networks:
+      - lab_network
+
+  bookstore03:
+    image: bookstore_custom
+    environment:
+      - VIRTUAL_HOST=bookstore.local
+    ports:
+      - 8023:8000
+    networks:
+      - lab_network
+
+  jupyter:
+    image: bookstore_custom
+    command: jupyter notebook --ip=0.0.0.0 --allow-root --no-browser --NotebookApp.password=sha1:58eaa2e688ae:11fd96685b9203d1256a1e09603c9be4f62c94b6
+    volumes:
+      - ./notebooks/:/code
+      - ./code/:/bookstore
+      - ./templates/:/templates
+      - ./docker-compose.yml:/docker-compose.yml
+    ports:
+      - 8888:8888
+    networks:
+      - lab_network
+
+  postgres:
+    image: postgres
+    environment:
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=secret123'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - lab_network
+
+
+volumes:
+  pgdata:
+
+
+networks:
+  lab_network:
+    external: false
