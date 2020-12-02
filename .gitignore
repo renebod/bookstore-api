@@ -132,3 +132,4 @@ dmypy.json
 # Application
 notebooks/.ipynb_checkpoints
 code
+**/.DS_Store
