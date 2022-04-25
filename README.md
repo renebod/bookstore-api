@@ -3,9 +3,7 @@ This is a guided tutorial for creating an API application for a Bookstore.
 
 Start project with the following commands:
 ```bash
-docker-compose run --rm bookstore django-admin startproject project #BUG; move all dirs one up
-docker-compose run --rm bookstore django-admin startapp bookstore
-docker-compose up -d && docker-compose logs -f bookstore
+. ./startme.sh
 ```
 
 Login to the Jupyter Notebook through:
