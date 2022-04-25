@@ -1,4 +1,4 @@
-from bookstore_api.models import *
+from bookstore.models import *
 
 authors = ["Harper Lee", "Jane Austen", "George Orwell", "J.D. Salinger", \
            "F. Scott Fitzgerald", "Emily Brontë", "Charlotte Brontë", \
