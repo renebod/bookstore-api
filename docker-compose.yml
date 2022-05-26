@@ -27,6 +27,15 @@ services:
     networks:
       - lab_network
 
+  splunk:
+    image: splunk/splunk:latest
+    environment:
+      - 'SPLUNK_START_ARGS=--accept-license'
+      - 'SPLUNK_PASSWORD=secret123'
+    ports:
+      - 8080:8000
+    networks:
+      - lab_network
 
 #   postgres:
 #     image: postgres
