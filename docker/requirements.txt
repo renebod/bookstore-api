@@ -1,8 +1,7 @@
 Django
 django_extensions
 djangorestframework
-# django-reversion
 jupyter
-# psycopg2-binary
+psycopg2-binary
 requests
 bs4
