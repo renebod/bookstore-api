@@ -65,3 +65,12 @@ def get_splunk_input_http(app):
     input_http.pop('fields', None)
     input_http.pop('links', None)
     return input_http, splunk_token
+
+
+def splunklog(dict):
+    url = "https://splunk:8088/services/collector"
+    var, splunk_token = get_splunk_input_http('bookstore')
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Splunk {splunk_token}'
+    }
