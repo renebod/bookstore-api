@@ -1,4 +1,5 @@
 import requests
+import json
 
 endpoint = "https://splunk:8089"
 auth = ('admin', 'secret123')
@@ -8,6 +9,7 @@ def get_splunk_index_list():
     data = {'output_mode':'json'}
     response = requests.get(url, data=data, auth=auth, verify=False).json()
     return [index['name'] for index in response['entry']]
+
 
 def get_splunk_index(app):
     index = f"{app}_index"
@@ -30,6 +32,7 @@ def get_splunk_index(app):
     index.pop('fields', None)
     index.pop('links', None)
     return index
+
 
 def get_splunk_input_http_list():
     url = f"{endpoint}/services/data/inputs/http"
@@ -67,10 +70,16 @@ def get_splunk_input_http(app):
     return input_http, splunk_token
 
 
-def splunklog(dict):
+def splunklog(app, dict):
     url = "https://splunk:8088/services/collector"
-    var, splunk_token = get_splunk_input_http('bookstore')
+    var, splunk_token = get_splunk_input_http(app)
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Splunk {splunk_token}'
     }
+    payload = {
+        'index': f'{app}_index',
+        'event': dict
+    }
+    response = requests.post(url, headers=headers, json=payload, verify=False).json()
+    return response
