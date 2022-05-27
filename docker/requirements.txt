@@ -1,6 +1,7 @@
 Django
 django_extensions
 djangorestframework
+django-simple-history
 jupyter
 psycopg2-binary
 requests
