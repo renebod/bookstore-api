@@ -37,6 +37,16 @@ services:
     networks:
       - lab_network
 
+  vault:
+    image: vault
+    environment:
+      - VAULT_DEV_ROOT_TOKEN_ID=secret123
+      # - VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:1234
+    ports:
+      - 8200:8200
+    networks:
+      - lab_network
+
 #   postgres:
 #     image: postgres
 #     environment:

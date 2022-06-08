@@ -2,7 +2,8 @@ Django
 django_extensions
 djangorestframework
 django-simple-history
-jupyter
 psycopg2-binary
+hvac
+jupyter
 requests
 bs4
