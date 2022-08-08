@@ -47,19 +47,19 @@ services:
     networks:
       - lab_network
 
-#   postgres:
-#     image: postgres
-#     environment:
-#       - 'POSTGRES_USER=postgres'
-#       - 'POSTGRES_PASSWORD=secret123'
-#     volumes:
-#       - pgdata:/var/lib/postgresql/data
-#     networks:
-#       - lab_network
-#
-#
-# volumes:
-#   pgdata:
+  postgres:
+    image: postgres
+    environment:
+      - 'POSTGRES_USER=postgres'
+      - 'POSTGRES_PASSWORD=secret123'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - lab_network
+
+
+volumes:
+  pgdata:
 
 
 networks:
