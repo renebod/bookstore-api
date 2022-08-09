@@ -1,14 +1,18 @@
 from rest_framework import viewsets
-from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from .serializers import *
 from .models import *
 
 
-class AuthorViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+    permission_classes = [IsAuthenticated]
 
 
-class BookViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
+class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
+

@@ -1,7 +1,9 @@
 Django
 django_extensions
 djangorestframework
+djangorestframework-simplejwt
 django-simple-history
+django-filter
 psycopg2-binary
 hvac
 jupyter
