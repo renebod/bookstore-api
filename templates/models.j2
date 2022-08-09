@@ -1,19 +1,27 @@
 from django.db import models
+import uuid
 from simple_history.models import HistoricalRecords
 
 
 class Author(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField("Author", max_length=20)
     history = HistoricalRecords()
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ('id',)
 
 class Book(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField("Title",max_length=100)
     author = models.ForeignKey(Author,related_name='books',on_delete=models.CASCADE)
     history = HistoricalRecords()
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        ordering = ('id',)
