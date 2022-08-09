@@ -4,8 +4,8 @@ from django.dispatch import receiver
 import uuid
 from simple_history.models import HistoricalRecords
 from jinja2 import Template
-from .splunk import *
-
+{% if splunk %}from .splunk import *
+{% endif %}
 
 class Author(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -29,6 +29,7 @@ class Book(models.Model):
 
     class Meta:
         ordering = ('id',)
+{% if splunk %}
 
 
 @receiver(post_save, sender=Book)
@@ -36,4 +37,4 @@ def create_user_stack(sender, **kwargs):
     dict = { 'message' : "Dummy test python client log", 'user': 'example'}
     log = splunklog('bookstore', dict)
     print(log)
-
+{% endif %}
