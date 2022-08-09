@@ -1,14 +1,23 @@
 from django.db import models
+from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import uuid
 from simple_history.models import HistoricalRecords
-from jinja2 import Template
 {% if splunk %}from .splunk import *
+from bookstore.serializers import *
 {% endif %}
 
-class Author(models.Model):
+
+class CommonModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    #created_by = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.PROTECT, editable=False, related_name="+")
+    #updated_by = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.PROTECT, editable=False, related_name="+")
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    updated_at = models.DateTimeField(auto_now=True, editable=False)
+
+
+class Author(CommonModel):
     name = models.CharField("Author", max_length=20)
     history = HistoricalRecords()
 
@@ -18,8 +27,8 @@ class Author(models.Model):
     class Meta:
         ordering = ('id',)
 
-class Book(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+class Book(CommonModel):
     title = models.CharField("Title",max_length=100)
     author = models.ForeignKey(Author,related_name='books',on_delete=models.CASCADE)
     history = HistoricalRecords()
@@ -33,8 +42,8 @@ class Book(models.Model):
 
 
 @receiver(post_save, sender=Book)
-def create_user_stack(sender, **kwargs):
-    dict = { 'message' : "Dummy test python client log", 'user': 'example'}
-    log = splunklog('bookstore', dict)
-    print(log)
+def send_to_splunk(sender, **kwargs):
+    serialized = BookSerializer(sender)
+    print(serialized)
+    splunklog('bookstore', serialized)
 {% endif %}
