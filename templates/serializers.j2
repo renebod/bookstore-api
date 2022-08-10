@@ -1,18 +1,82 @@
 from rest_framework import serializers
+from rest_framework.reverse import reverse
+from django.contrib.auth.models import User
 from .models import *
 
 
-class AuthorSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Author
-        # fields = ('url', 'id', 'name', 'books')
-        fields = '__all__'
-        depth = 1
+# class UserSerializer(serializers.ModelSerializer):
+#     name = serializers.SerializerMethodField()
+
+#     def get_name(self, obj):
+#         return User.objects.get(id=obj.changed_by_id)
 
 
-class BookSerializer(serializers.HyperlinkedModelSerializer):
+class HistoricalRecordField(serializers.ListField):
+    child = serializers.DictField()
+
+    def to_representation(self, data):
+        return super().to_representation(data.values())
+
+
+class BookSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Book
-        # fields = ('url', 'id', 'title', 'author')
-        fields = '__all__'
+        fields = ('url', 'title')
         depth = 1
+    
+    def get_url(self, obj):
+        return reverse('book-detail',kwargs={'pk':obj.pk}, request=self.context['request'])
+
+
+class BookDetailSerializer(BookSerializer):
+    tenant = serializers.CharField(source='tenant.name', read_only=True)
+
+    class Meta:
+        model = Book
+        fields = ('url', 'id', 'title', 'author', 'updated_by')
+        read_only_fields = ['id']
+        depth = 1
+
+
+class BookCreateSerializer(BookSerializer):
+
+    class Meta:
+        model = Book
+        fields = ('url', 'title', 'author')
+        read_only_fields = ['id']
+
+
+class AuthorSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Author
+        fields = ('url', 'id', 'name')
+        read_only_fields = ['id']
+        depth = 1
+
+    def get_url(self, obj):
+        return reverse('author-detail',kwargs={'pk':obj.pk}, request=self.context['request'])
+
+
+class AuthorDetailSerializer(AuthorSerializer):
+    books = BookSerializer(many=True)
+    # changed_by = changed_by_id
+    # changed_by2 = serializers.CharField(source=User.objects.get(instance.changed_by_id), read_only=True)
+    history = HistoricalRecordField(read_only=True)
+
+    class Meta:
+        model = Author
+        fields = ('url', 'id', 'name', 'books', 'history')
+        read_only_fields = ['id']
+        depth = 1
+
+
+class AuthorCreateSerializer(AuthorSerializer):
+
+    class Meta:
+        model = Author
+        fields = ('url', 'name')
+        read_only_fields = ['id']

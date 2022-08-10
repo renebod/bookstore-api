@@ -7,17 +7,26 @@ from .serializers import *
 from .models import *
 
 
-#class AuthorViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
-    serializer_class = AuthorSerializer
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return AuthorSerializer
+        if self.action == 'retrieve':
+            return AuthorDetailSerializer
+        return  AuthorCreateSerializer
     permission_classes = [IsAuthenticated]
 
 
-#class BookViewSet(LoginRequiredMixin, viewsets.ModelViewSet):
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
-    serializer_class = BookSerializer
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return BookSerializer
+        if self.action == 'retrieve':
+            return BookDetailSerializer
+        return  BookCreateSerializer
     permission_classes = [IsAuthenticated]
     #filter_backends = (DjangoFilterBackend)
     #filterset_fields = ('author',)
+    permission_classes = [IsAuthenticated]
