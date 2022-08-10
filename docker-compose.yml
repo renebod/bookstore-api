@@ -5,6 +5,9 @@ services:
   bookstore:
     build:
       context: ./docker
+      # args:
+      #   - http_proxy=http://proxy.example.com
+      #   - https_proxy=https://proxy.example.com
     image: bookstore_custom
     command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
