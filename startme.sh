@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-docker-compose build
 docker-compose down -v
+docker-compose build
 docker-compose run --rm bookstore rm -Rf manage.py project bookstore manage.py db.sqlite3
 docker-compose run --rm bookstore django-admin startproject project .
 docker-compose run --rm bookstore python manage.py startapp bookstore

@@ -80,3 +80,16 @@ class AuthorCreateSerializer(AuthorSerializer):
         model = Author
         fields = ('url', 'name')
         read_only_fields = ['id']
+
+
+class AuthorSpecialDetailSerializer(serializers.ModelSerializer):
+    # books = BookSerializer(many=True)
+    # changed_by = changed_by_id
+    # changed_by2 = serializers.CharField(source=User.objects.get(instance.changed_by_id), read_only=True)
+    history = HistoricalRecordField(read_only=True)
+
+    class Meta:
+        model = Author
+        fields = ('id', 'name', 'history')
+        read_only_fields = ['id']
+        depth = 1
