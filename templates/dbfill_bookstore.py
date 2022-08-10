@@ -18,11 +18,12 @@ books = [{"title": "To Kill a Mockingbird", "author": "Harper Lee"}, \
 
 def run():
     for a in authors:
-        Author.objects.get_or_create(name=a)
+        Author.objects.get_or_create(name=a, changed_by_id=1)
 
     for b in books:
         Book.objects.get_or_create(title=b['title'], \
-                                   author=Author.objects.get(name=b['author']))
+                                   author=Author.objects.get(name=b['author']), \
+                                   changed_by_id=1)
 
     print("Imported %s books, by %s authors" % (len(Book.objects.all()),\
                                                 len(Author.objects.all())))
