@@ -3,46 +3,37 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-import uuid
 from simple_history.models import HistoricalRecords
+import uuid
 {% if splunk %}from .splunk import *
 from bookstore.serializers import *
 {% endif %}
 
-{% if False %}https://blog.biodun.dev/django-abstract-models-cko5totm908kt83s1fjhug903{% endif %}
+
+from django.db import models
+from simple_history.models import HistoricalRecords
+
 class AbstractModel(models.Model):
-    #created_at = models.DateTimeField(auto_now_add=True)
-    #updated_at = models.DateTimeField(auto_now=True)
-    #deleted_on = models.DateTimeField(null=True, blank=True) # This can be used for soft delete
-    created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING)
-    updated_by = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    #question = models.CharField(max_length=200)
+    #pub_date = models.DateTimeField('date published')
+    changed_by = models.ForeignKey('auth.User', on_delete=models.PROTECT, editable=False)
+    history = HistoricalRecords(inherit=True)
+
+    @property
+    def _history_user(self):
+        return self.changed_by
+
+    @_history_user.setter
+    def _history_user(self, value):
+        self.changed_by = value
 
     class Meta:
-        abstract = True # This is the most important aspect of this class
-
-    # You other universal logic/methods can go here
-
-    # This is for soft delete
-    def delete(self):
-        self.deleted_on = timezone.now()
-        self.save(updated_fields = ['deleted_on'])
-
-    def hard_delete(self):
-        super(AbstractModel, self).delete()
-
-    # You can also override the save method 
-    def save(self, *args, **kwargs):
-        user = kwargs.get("user")
-        if self.pk:  # Object already exists
-             self.updated_by = user # This can be passed from maybe your views
-        else:
-             self.created_by = user # This can be passed from maybe your views
-        super(AbstractModel, self).save(*args, **kwargs)
-
+        abstract = True
 
 class Author(AbstractModel):
     name = models.CharField("Author", max_length=20)
-    history = HistoricalRecords()
+    #history = HistoricalRecords()
 
     def __str__(self):
         return self.name
@@ -54,7 +45,7 @@ class Author(AbstractModel):
 class Book(AbstractModel):
     title = models.CharField("Title",max_length=100)
     author = models.ForeignKey(Author,related_name='books',on_delete=models.CASCADE)
-    history = HistoricalRecords()
+    #history = HistoricalRecords()
 
     def __str__(self):
         return self.title
