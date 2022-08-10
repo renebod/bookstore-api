@@ -56,6 +56,7 @@ for i, n in enumerate(notebooks):
             msg = 'Timeout executing the notebook "%s".\n' % n
             print(msg)
         finally:
+            pass
             # Write output file
-            with open(n_out + '.ipynb', mode='wt') as f:
-                nbformat.write(nb, f)
+            # with open(n_out + '.ipynb', mode='wt') as f:
+            #     nbformat.write(nb, f)
