@@ -13,8 +13,8 @@ docker-compose run --rm jupyter python run_notebooks.py '01 Automation Challenge
 docker-compose run --rm jupyter python run_notebooks.py '02 Automation Challenge Book API - Database.ipynb'
 docker-compose run --rm jupyter python run_notebooks.py '03 Automation Challenge Book API - Models.ipynb'
 docker-compose run --rm jupyter python run_notebooks.py '04 Automation Challenge Book API - Serialization.ipynb'
-# docker-compose run --rm jupyter python run_notebooks.py '05 Automation Challenge Book API - URLs en Views.ipynb'
-# docker-compose run --rm jupyter python run_notebooks.py '06 Automation Challenge Book API - Pagination.ipynb'
+docker-compose run --rm jupyter python run_notebooks.py '05 Automation Challenge Book API - URLs en Views.ipynb'
+docker-compose run --rm jupyter python run_notebooks.py '06 Automation Challenge Book API - Pagination.ipynb'
 
 docker-compose logs -f
 
