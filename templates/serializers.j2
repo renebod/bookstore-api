@@ -40,8 +40,7 @@ class AuthorDetailSerializer(AuthorSerializer):
 
     class Meta:
         model = Author
-        # fields = ('url', 'name', 'books', 'created_by', 'history')
-        fields = ('url', 'name', 'books', 'created_by')
+        fields = ('url', 'name', 'books', 'created_by', 'history')
         read_only_fields = ['url']
         depth = 1
     
@@ -49,6 +48,7 @@ class AuthorDetailSerializer(AuthorSerializer):
         return obj.history.last().changed_by.username
 
     def get_history(self, obj):
+        return []
         return obj.history.all()
 
 
@@ -57,6 +57,10 @@ class AuthorCreateSerializer(AuthorSerializer):
     class Meta:
         model = Author
         fields = ('name', 'changed_by')
+        
+    def validate(self, data):
+        data['changed_by_id'] = self.context['request'].user.id
+        return data
 
 
 class BookDetailSerializer(BookSerializer):
@@ -67,8 +71,7 @@ class BookDetailSerializer(BookSerializer):
 
     class Meta:
         model = Book
-        # fields = ('url', 'title', 'author', 'created_by', 'history')
-        fields = ('url', 'title', 'author', 'created_by')
+        fields = ('url', 'title', 'author', 'created_by', 'history')
         read_only_fields = ['url']
         depth = 1
     
@@ -76,6 +79,7 @@ class BookDetailSerializer(BookSerializer):
         return obj.history.last().changed_by.username
 
     def get_history(self, obj):
+        return []
         return obj.history.all()
 
 
@@ -84,3 +88,7 @@ class BookCreateSerializer(BookSerializer):
     class Meta:
         model = Book
         fields = ('title', 'author', 'changed_by')
+    
+    def validate(self, data):
+        data['changed_by_id'] = self.context['request'].user.id
+        return data
