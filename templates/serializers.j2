@@ -19,7 +19,16 @@ class AbstractSerializer(serializers.ModelSerializer):
         return obj.changed_by.username
 
     def get_history(self, obj):
-        return obj.history.all().values()
+        history = []
+        for h in obj.history.all():
+            h.__dict__['changed_by'] = h.changed_by.username
+            h.__dict__['history_date'] = h.history_date.isoformat()
+            h.__dict__.pop('changed_by_id', None)
+            h.__dict__.pop('history_user_id', None)
+            h.__dict__.pop('history_change_reason', None)
+            h.__dict__.pop('_state', None)
+            history.append(h.__dict__)
+        return history
 
     def validate(self, data):
         data['changed_by_id'] = self.context['request'].user.id
@@ -40,34 +49,37 @@ class BookSerializer(AbstractSerializer):
         fields = ('url', 'title')
 
 
-class AuthorDetailSerializer(AuthorSerializer):
+class AuthorDetailSerializer(AbstractSerializer):
     books = BookSerializer(many=True)
 
     class Meta:
         model = Author
         fields = ('url', 'name', 'books', 'created_by', 'history')
-        read_only_fields = ['url']
+        read_only_fields = ['url', 'created_by', 'history']
         depth = 1
 
 
-class AuthorCreateSerializer(AuthorSerializer):
+class AuthorCreateSerializer(AbstractSerializer):
 
     class Meta:
         model = Author
         fields = ('url', 'name', 'changed_by')
+        read_only_fields = ['url', 'created_by', 'history']
 
 
-class BookDetailSerializer(BookSerializer):
+class BookDetailSerializer(AbstractSerializer):
+    author = AuthorSerializer(many=False)
 
     class Meta:
         model = Book
         fields = ('url', 'title', 'author', 'created_by', 'history')
-        read_only_fields = ['url']
+        read_only_fields = ['url', 'created_by', 'history']
         depth = 1
 
 
-class BookCreateSerializer(BookSerializer):
+class BookCreateSerializer(AbstractSerializer):
 
     class Meta:
         model = Book
         fields = ('url', 'title', 'author', 'changed_by')
+        read_only_fields = ['url', 'created_by', 'history']
