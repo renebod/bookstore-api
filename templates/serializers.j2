@@ -3,98 +3,71 @@ from rest_framework.reverse import reverse
 from .models import *
 
 
-# class HistoricalRecordField(serializers.ListField):
-#     child = serializers.DictField()
-
-#     def to_representation(self, data):
-#         return super().to_representation(data.values())
-
-
-class AuthorSerializer(serializers.ModelSerializer):
+class AbstractSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField(read_only=True)
+    created_by = serializers.SerializerMethodField()
+    changed_by = serializers.SerializerMethodField()
+    history = serializers.SerializerMethodField()
+
+    def get_url(self, obj):
+        return reverse(f'{obj._meta.model_name}-detail',kwargs={'pk':obj.pk}, request=self.context['request'])
+
+    def get_created_by(self, obj):
+        return obj.history.last().changed_by.username
+
+    def get_changed_by(self, obj):
+        return obj.changed_by.username
+
+    def get_history(self, obj):
+        return obj.history.all().values()
+
+    def validate(self, data):
+        data['changed_by_id'] = self.context['request'].user.id
+        return data
+
+
+class AuthorSerializer(AbstractSerializer):
 
     class Meta:
         model = Author
         fields = ('url', 'name')
 
-    def get_url(self, obj):
-        return reverse('author-detail',kwargs={'pk':obj.pk}, request=self.context['request'])
 
-
-class BookSerializer(serializers.ModelSerializer):
-    url = serializers.SerializerMethodField(read_only=True)
+class BookSerializer(AbstractSerializer):
 
     class Meta:
         model = Book
         fields = ('url', 'title')
-    
-    def get_url(self, obj):
-        return reverse('book-detail',kwargs={'pk':obj.pk}, request=self.context['request'])
 
 
 class AuthorDetailSerializer(AuthorSerializer):
     books = BookSerializer(many=True)
-    created_by = serializers.SerializerMethodField()
-    # history = HistoricalRecordField(read_only=True)
-    history = serializers.SerializerMethodField()
 
     class Meta:
         model = Author
         fields = ('url', 'name', 'books', 'created_by', 'history')
         read_only_fields = ['url']
         depth = 1
-    
-    def get_created_by(self, obj):
-        return obj.history.last().changed_by.username
-
-    def get_history(self, obj):
-        return obj.history.all().values()
 
 
 class AuthorCreateSerializer(AuthorSerializer):
-    changed_by = serializers.SerializerMethodField()
 
     class Meta:
         model = Author
         fields = ('url', 'name', 'changed_by')
 
-    def get_changed_by(self, obj):
-        return obj.changed_by.username
-
-    def validate(self, data):
-        data['changed_by_id'] = self.context['request'].user.id
-        return data
-
 
 class BookDetailSerializer(BookSerializer):
-    author = AuthorSerializer()
-    created_by = serializers.SerializerMethodField()
-    # history = HistoricalRecordField(read_only=True)
-    history = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
         fields = ('url', 'title', 'author', 'created_by', 'history')
         read_only_fields = ['url']
         depth = 1
-    
-    def get_created_by(self, obj):
-        return obj.history.last().changed_by.username
-
-    def get_history(self, obj):
-        return obj.history.all().values()
 
 
 class BookCreateSerializer(BookSerializer):
-    changed_by = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
         fields = ('url', 'title', 'author', 'changed_by')
-
-    def get_changed_by(self, obj):
-        return obj.changed_by.username
-
-    def validate(self, data):
-        data['changed_by_id'] = self.context['request'].user.id
-        return data
