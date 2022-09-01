@@ -6,7 +6,6 @@ from django.dispatch import receiver
 import uuid
 from simple_history.models import HistoricalRecords
 {% if splunk %}from .splunk import *
-from bookstore.serializers import *
 {% endif %}
 
 
@@ -55,9 +54,11 @@ class Book(AbstractModel):
 {% if splunk %}
 
 
-@receiver(post_save, sender=Book)
+@receiver(post_save, sender=HistoricalBook)
 def send_to_splunk(sender, **kwargs):
-    serialized = BookSerializer(sender)
-    print(serialized)
-    splunklog('bookstore', serialized)
+    print(sender)
+    # serialized = BookSerializer(sender)
+    #for h in sender.history.all():
+    #    print(splunkcheck('bookstore', h.history_id))
+    # splunklog('bookstore', serialized)
 {% endif %}

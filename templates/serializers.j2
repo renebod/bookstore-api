@@ -3,6 +3,16 @@ from rest_framework.reverse import reverse
 from .models import *
 
 
+def history_cleanup(h):
+    h.__dict__['changed_by'] = h.changed_by.username
+    h.__dict__['history_date'] = h.history_date.isoformat()
+    h.__dict__.pop('changed_by_id', None)
+    h.__dict__.pop('history_user_id', None)
+    h.__dict__.pop('history_change_reason', None)
+    h.__dict__.pop('_state', None)
+    return h.__dict__
+
+
 class AbstractSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField(read_only=True)
     created_by = serializers.SerializerMethodField()
@@ -21,13 +31,8 @@ class AbstractSerializer(serializers.ModelSerializer):
     def get_history(self, obj):
         history = []
         for h in obj.history.all():
-            h.__dict__['changed_by'] = h.changed_by.username
-            h.__dict__['history_date'] = h.history_date.isoformat()
-            h.__dict__.pop('changed_by_id', None)
-            h.__dict__.pop('history_user_id', None)
-            h.__dict__.pop('history_change_reason', None)
-            h.__dict__.pop('_state', None)
-            history.append(h.__dict__)
+            h = history_cleanup(h)
+            history.append(h)
         return history
 
     def validate(self, data):
